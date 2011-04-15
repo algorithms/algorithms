@@ -1,0 +1,103 @@
+/**
+ * Theory of Software Development
+ * Copyright (C) 2011  Andrey Pudov
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * In a breadth-first traversal, we visit the starting node and then on the 
+ * first pass visit all of the nodes directly connected to it. In the second 
+ * pass, we visit nodes that are two edges “away” from the starting node. With 
+ * each new pass, we visit nodes that are one more edge away. Because there 
+ * might be cycles in the graph, it is possible for a node to be on two paths 
+ * of different lengths from the starting node. Because we will visit that node
+ * for the first time along the shortest path from the starting node, we will 
+ * not need to consider it again. We will, therefore, either need to keep a list
+ * of the nodes we have visited or we will need to use a variable in the node to
+ * mark it as visited to prevent multiple visits.
+ *
+ * @version 0.00 28 Feb 2011
+ * @author  Andrey Pudov  
+ */
+class BreadthFirstTraversal {
+
+    private static boolean[] marked;
+    private static int[]     queue;
+    private static int       queuePos;
+
+    /**
+     * BreadthFirstTraversal(G, v)
+     * Visit( v )
+     * Mark( v )
+     * Enqueue( v )
+     * while the queue is not empty do
+     *     Dequeue( x )
+     *     for every edge xw in G do
+     *         if w is not marked then
+     *             Visit( w )
+     *             Mark( w )
+     *             Enqueue( w )
+     *         end if
+     *     end for
+     * end while
+     *
+     * @param g is the graph
+     * @param v is the current node
+     */
+    private static void BreadthFirstTraversal(int[][] g, int v) {
+	/* visit(v) */ System.out.print( " -> " + v);
+	marked[v] = true;
+	enqueue(v);
+
+	while (queuePos >= 0) {
+	    int x = dequeue(); 
+	    for (int w = 0; w < g[x].length; ++w) {
+		if ((g[x][w] == 1) && (!marked[w])) {
+		    /* visit(w) */ System.out.print( " -> " + w);
+		    marked[w] = true;
+		    enqueue(w);
+		}
+	    }
+	}
+    }
+
+    private static void enqueue(int v) {
+	queue[++queuePos] = v;
+    }
+
+    private static int dequeue() {
+	return queue[queuePos--];
+    }
+
+    public static void main(String[] args) {
+	/* adjacency matrix */
+	int[][] adjmat = 
+	    {{0, 1, 0, 0, 0, 0, 0, 1, 0},
+	     {1, 0, 1, 0, 0, 0, 0, 1, 0},
+	     {0, 1, 0, 1, 0, 0, 0, 1, 0},
+	     {0, 0, 1, 0, 0, 0, 1, 0, 1},
+	     {0, 0, 0, 0, 0, 1, 1, 0, 0},
+	     {0, 0, 0, 0, 1, 0, 0, 0, 0},
+	     {0, 0, 0, 1, 1, 0, 0, 1, 0},
+	     {1, 1, 1, 0, 0, 0, 1, 0, 0},
+	     {0, 0, 0, 1, 0, 0, 0, 0, 0}};
+
+	marked = new boolean[adjmat.length];
+	queue  = new int[adjmat.length];
+	queuePos = -1;
+
+	BreadthFirstTraversal(adjmat, 0);
+    }
+}

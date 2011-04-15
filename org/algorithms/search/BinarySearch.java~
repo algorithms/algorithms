@@ -1,0 +1,112 @@
+/**
+ * Theory of Software Development
+ * Copyright (C) 2011  Andrey Pudov
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * In computer science, a binary search or half-interval search algorithm 
+ * locates the position of an item in a sorted array. Binary search works  
+ * by comparing an input value to the middle element of the array. The 
+ * comparison determines whether the element equals the input, less than the 
+ * input or greater. When the element being compared to equals the input the 
+ * search stops and typically returns the position of the element. If the 
+ * element is not equal to the input then a comparison is made to determine 
+ * whether the input is less than or greater than the element. Depending on 
+ * which it is the algorithm then starts over but only searching the top or 
+ * bottom subset of the array's elements. If the input is not located within the
+ * array the algorithm will usually output a unique value indicating this. 
+ * Binary search algorithms typically halve the number of items to check with
+ * each successive iteration, thus locating the given item (or determining its 
+ * absence) in logarithmic time. A binary search is a dichotomic divide and 
+ * conquer search algorithm.
+ *
+ * @version 0.00 06 Feb 2011
+ * @author  Andrey Pudov
+ */
+public class BinarySearch {
+
+    /**
+     * @param list   the elements to be searching
+     * @param target the value being searched for
+     * @param n	     the number of elements in the list
+     * @return	     index of the search key
+     */
+    public static int search(int[] list, int target, int n) {
+	int start = 0;
+	int middle;
+	int end = n - 1;
+
+	while (start <= end) {
+	    middle = (start + end) / 2;
+	    switch (compare(list[middle], target)) {
+	    case -1:
+		/* list[middle] < target */
+		start = middle + 1;
+		break;
+	    case 0:
+		/* list[middle] == target */
+		return middle;
+	    case 1:
+		/* list[middle] > target */
+		end = middle - 1;
+		break;
+	    default:
+		/* falls trhough */
+	    }
+	}
+	
+	return -1;
+    }
+
+    /**
+     *                 |-1 if x < y
+     * Compare(x, y) = | 0 if x = y
+     *                 | 1 if x > y
+     *
+     * The Compare function should be counted as one comparison and can best be
+     * used in a switch.
+     */
+    private static int compare(int x, int y) {
+	if (x < y) {
+	    return -1;
+	} else if (x == y) {
+	    return 0;
+	} else {
+	    /* x > y */
+	    return 1;
+	}
+    }
+
+    public static void main(String[] args) {
+	/** the maximum size of an array */
+	int MAX_LEN = 20000000;
+
+	/** the value being searched for (random int >= 0 and < n) */
+	int target  = new java.util.Random().nextInt(MAX_LEN);
+	System.out.println("target: " + target);
+
+	int[] sorted = new int[MAX_LEN];
+	for (int i = 0; i < sorted.length; i++) {
+	    sorted[i] = i;
+	}
+
+	long startTime = System.currentTimeMillis();
+	search(sorted, target, sorted.length);
+	long endTime = System.currentTimeMillis();
+	float seconds = (endTime - startTime) / 1000F;
+	System.out.println(Float.toString(seconds) + " seconds.");
+    }
+}

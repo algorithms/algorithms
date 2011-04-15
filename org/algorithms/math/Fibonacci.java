@@ -1,0 +1,247 @@
+/**
+ * Copyright (C) 2011 by Andrey Pudov
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+
+/**
+ * In mathematics, the Fibonacci numbers are the numbers in the 
+ * following integer sequence:
+ * 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+ *
+ * By definition, the first two Fibonacci numbers are 0 and 1, and each 
+ * subsequent number is the sum of the previous two. Some sources omit the 
+ * initial 0, instead beginning the sequence with two 1s.
+ *
+ * In mathematical terms, the sequence Fn of Fibonacci numbers is defined by 
+ * the recurrence relation
+ * F[n] = F[n - 1] + F[n - 2]
+ * with seed values
+ * F[0] = 0 and F[1] = 1
+ *
+ * The Fibonacci sequence is named after Leonardo of Pisa, who was known as 
+ * Fibonacci (a contraction of filius Bonacci, "son of Bonaccio"). Fibonacci's 
+ * 1202 book Liber Abaci introduced the sequence to Western European 
+ * mathematics, although the sequence was independently described in Indian 
+ * mathematics and it is disputed which came first.
+ *
+ * Fibonacci numbers are used in the analysis of financial markets, in 
+ * strategies such as Fibonacci retracement, and are used in computer 
+ * algorithms such as the Fibonacci search technique and the Fibonacci heap 
+ * data structure. The simple recursion of Fibonacci numbers has also inspired 
+ * a family of recursive graphs called Fibonacci cubes for interconnecting 
+ * parallel and distributed systems. They also appear in biological settings, 
+ * such as branching in trees, arrangement of leaves on a stem, the fruit 
+ * spouts of a pineapple, the flowering of artichoke, an uncurling fern and 
+ * the arrangement of a pine cone.
+ *
+ * @version 0.00 02 Feb 2011
+ * @author  Andrey Pudov
+ */
+public class Fibonacci {
+
+    /**
+     * This simple java program uses recursion to calculate Fibonacci numbers
+     *
+     * @param n 
+     */
+    public static int compute(int n) {
+	/* recursion */
+	if (n < 2) {
+	    return n;
+	} else {
+	    return compute(n - 1) + compute(n - 2);
+	}
+    }
+
+    /**
+     * Although it is based directly on the definition of a Fibonacci number, 
+     * the recursive Fibonacci algorithm is extremely expensive, requiring 
+     * time O(2n). It also performs a huge amount of redundant work because it 
+     * computes many Fibonnaci values from scratch many times. A simple 
+     * linear-time iterative approach which calculates each value of fib 
+     * successively can avoid these issues:
+     */
+    public static int compute2(int n) {
+	/* iteration */
+	/* 
+	 * Note that even this implementation is only suitable for small values
+	 * of n, since the Fibonacci function grows exponentially and 32-bit 
+	 * signed Java integers can only hold the first 46 Fibonacci numbers.
+	 */
+	int prev1 = 0;
+	int prev2 = 1;
+
+        for(int i=0; i<n; i++) {
+	    int savePrev1 = prev1;
+
+            prev1 = prev2;
+            prev2 = savePrev1 + prev2;
+	}
+
+        return prev1;
+    }
+
+    /**
+     * Although the recursive implementation given above is elegant and close 
+     * to the mathematical definition, it is not very practical. Calculating 
+     * the nth fibonacci number requires calculating two smaller fibonacci 
+     * numbers, which in turn require two additional recursive calls each, 
+     * and so on until all branches reach 1. The iterative solution is faster, 
+     * but still repeats a lot of calculations when computing successive 
+     * fibonacci numbers. To remedy this, we can employ memoization to cache 
+     * previous computations.
+     * 
+     * We first establish a memoization "cache", which stores previously 
+     * computed fibonacci numbers. In this case we use an ArrayList, initialized     * with the first two fibonacci numbers, as the cache. Note that we have 
+     * also moved from using ints to using Java's BigInteger class, which 
+     * provides arbitrary-precision integers. As a result, the memoized 
+     * implementation can also compute much larger fibonacci numbers than the 
+     * previous solutions (although they too could have been implemented using 
+     * BigIntegers.
+     */
+
+    /** Memoization cache */
+    private static ArrayList<BigInteger> fibCache = new ArrayList<BigInteger>();
+    static {
+	fibCache.add(BigInteger.ZERO);
+	fibCache.add(BigInteger.ONE);
+    }
+
+    /**
+     * The actual implementation of the fib() function using memoization looks 
+     * quite similar to the basic recursive function. The difference is that a 
+     * new fibonacci number is only computed if the cache does not already 
+     * contain the necessary value. Newly computed fibonacci numbers are added 
+     * to the cache, so that they become available during later calls to fib().
+     */
+    public static BigInteger compute3(int n) {
+	/* memoized recursion */
+	if (n >= fibCache.size()) {
+	    fibCache.add(n, compute3(n - 1).add(compute3(n - 2)));
+        }
+        
+	return fibCache.get(n);
+    }
+
+    
+    public static int compute4(int n) {
+	int[] val = new int[46]; /* 46 is a limit for integers */
+
+	if (n < 2) {
+	    return n;
+	} else {
+	    val[0] = 1;
+	    val[1] = 1;
+
+	    for (int i = 2; i < n; ++i) {
+		val[i] = val[i - 1] + val[i - 2];
+	    }
+
+	    return val[n - 1];
+	}
+    }
+
+    private static int[] val2 = new int[47]; /* 46 is a limit for integers */
+    private static int   val2size = 0;
+    static {
+	val2[0] = 1;
+	val2[1] = 1;
+    }
+
+    public static int compute5(int n) {
+	if (n < 2) {
+	    return n;
+	} else {
+	    if (val2size < n) {
+		val2[n] = compute5(n - 1) + compute5(n - 2);
+		val2size++;
+	    }
+
+	    return val2[n];
+	}
+    }
+
+    public static int compute6(int n) {
+	int val_1 = 1;
+	int val_2 = 1;
+	int val   = 0;
+
+	if (n < 2) {
+	    return n;
+	} else {
+	    for (int i = 2; i < n; ++i) {
+		val = val_1 + val_2;
+		val_2 = val_1;
+		val_1 = val;
+	    }
+
+	    return val;
+	}
+    }
+
+    public static void main(String[] args) {
+	final int NUMBER = 46;
+
+	/* recursion */
+	long startTime = System.currentTimeMillis();
+	//System.out.println(compute(NUMBER));
+	long endTime = System.currentTimeMillis();
+	float seconds = (endTime - startTime) / 1000F;
+	System.out.println(Float.toString(seconds) + " seconds.");
+
+	/* iteration */
+	startTime = System.currentTimeMillis();
+	System.out.println(compute2(NUMBER));
+	endTime = System.currentTimeMillis();
+	seconds = (endTime - startTime) / 1000F;
+	System.out.println(Float.toString(seconds) + " seconds.");
+
+	/* memoized recursion - ArrayList */
+	startTime = System.currentTimeMillis();
+	System.out.println(compute3(NUMBER));
+	endTime = System.currentTimeMillis();
+	seconds = (endTime - startTime) / 1000F;
+	System.out.println(Float.toString(seconds) + " seconds.");
+
+	/* memoized - array */
+	startTime = System.currentTimeMillis();
+	System.out.println(compute4(NUMBER));
+	endTime = System.currentTimeMillis();
+	seconds = (endTime - startTime) / 1000F;
+	System.out.println(Float.toString(seconds) + " seconds.");
+
+	/* memoized recursion - array */
+	startTime = System.currentTimeMillis();
+	System.out.println(compute5(NUMBER));
+	endTime = System.currentTimeMillis();
+	seconds = (endTime - startTime) / 1000F;
+	System.out.println(Float.toString(seconds) + " seconds.");
+	
+	/* iteration - inside vars */
+	startTime = System.currentTimeMillis();
+	System.out.println(compute6(NUMBER));
+	endTime = System.currentTimeMillis();
+	seconds = (endTime - startTime) / 1000F;
+	System.out.println(Float.toString(seconds) + " seconds.");
+    }
+}

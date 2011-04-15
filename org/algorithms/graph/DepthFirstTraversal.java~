@@ -1,0 +1,84 @@
+/**
+ * Theory of Software Development
+ * Copyright (C) 2011  Andrey Pudov
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * In depth-first traversal, we visit the starting node and then proceed to 
+ * follow links through the graph until we reach a dead end. In an undirected 
+ * graph, a node is a dead end if all of the nodes adjacent to it have already 
+ * been visited. In a directed graph, if a node has no outgoing edges, we also 
+ * have a dead end.
+ *
+ * When we reach a dead end, we back up along our path until we find an 
+ * unvisited adjacent node and then continue in that new direction. The process
+ * will have completed when we back up to the starting node and all the nodes 
+ * adjacent to it have been visited. In illustrating this algorithm and  all 
+ * others in this chapter, if presented with a choice of two nodes, we will
+ * choose the node with the numerically or alphabetically smaller label. When
+ *  this algorithm is implemented, that choice will depend on how the edges of 
+ * the graph are stored.
+ *
+ * @version 0.00 28 Feb 2011
+ * @author  Andrey Pudov  
+ */
+class DepthFirstTraversal {
+
+    private static boolean[] marked;
+
+    /**
+     * DepthFirstTraversal(G, v)
+     * Visit( v )
+     * Mark( v )
+     * for every edge vw in G do
+     *     if w is not marked then
+     *         DepthFirstTraversal(G, w)
+     *     end if
+     * end for
+     *
+     * @param g is the graph
+     * @param v is the current node
+     */
+    private static void DepthFirstTraversal(int[][] g, int v) {
+	/* visit(v) */
+	System.out.print( " -> " + v);
+	marked[v] = true;
+
+	for (int w = 0; w < g[v].length; ++w) {
+	    if ((g[v][w] == 1) && (!marked[w])) {
+		DepthFirstTraversal(g, w);	
+	    }
+	}	
+    }
+
+    public static void main(String[] args) {
+	/* adjacency matrix */
+	int[][] adjmat = 
+	    {{0, 1, 0, 0, 0, 0, 0, 1, 0},
+	     {1, 0, 1, 0, 0, 0, 0, 1, 0},
+	     {0, 1, 0, 1, 0, 0, 0, 1, 0},
+	     {0, 0, 1, 0, 0, 0, 1, 0, 1},
+	     {0, 0, 0, 0, 0, 1, 1, 0, 0},
+	     {0, 0, 0, 0, 1, 0, 0, 0, 0},
+	     {0, 0, 0, 1, 1, 0, 0, 1, 0},
+	     {1, 1, 1, 0, 0, 0, 1, 0, 0},
+	     {0, 0, 0, 1, 0, 0, 0, 0, 0}};
+
+	marked = new boolean[adjmat.length];
+
+	DepthFirstTraversal(adjmat, 0);
+    }
+}
